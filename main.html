@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Share PC</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4/css/metro-all.min.css">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
+    <div class="container">
+        <br>
+        <div data-role="panel">
+            <input id="inpFile" type="file" data-role="file" data-mode="drop">
+        </div>
+        <br>
+        <div data-role="panel">
+            <br>
+            <input id="inpText" type="text" data-role="materialinput" placeholder="Enter text to share (press enter to send)">
+            <br>
+        </div>
+    </div>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://cdn.metroui.org.ua/v4/js/metro.min.js"></script>
+    <script>
+
+        $("input[type=file]").on('change',function(){
+            var reader = new FileReader();
+            var fileToRead = document.querySelector("#inpFile").files[0];
+            if (fileToRead) {
+                if(fileToRead["type"] == "text/plain"){
+                        var progress = Metro.activity.open({
+                        type: 'square',
+                        overlayColor: '#fff',
+                        overlayAlpha: 1,
+                        text: '<div class=\'mt-2 text-small\'>Please, wait...</div>',
+                        overlayClickClose: true
+                    });
+
+                    reader.onload = function(evt) {
+                        if(evt.target.readyState != 2) {
+                            return;
+                        }
+                        if(evt.target.error) {
+                            alert('Error while reading file');
+                            return;
+                        }
+                        fileContent = evt.target.result;
+                        var data = {"type":"file", "content":fileContent, "file_name":fileToRead["name"], "file_type":fileToRead["type"]};
+                        eel.send_data(data);
+                        Metro.activity.close(progress);
+                    };
+                } else {
+              alert("Only support file type: text/plain");
+            }
+            } else {
+              alert("Failed to load file");
+            }
+            reader.readAsText(document.querySelector("#inpFile").files[0]);
+            document.getElementById("inpFile").value = "";
+        });
+        $("#inpText").on('keypress', function (e) {
+            if(e.which === 13){
+                    var text = "";
+                    text += $("#inpText").val()
+                    var data = {"type":"text", "content": text, "file_name": "", "file_type": ""};
+                    eel.send_data(data);
+                    document.getElementById("inpText").value = "";
+                }
+        });
+    </script>
+</body>
+</html>
