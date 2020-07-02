@@ -37,6 +37,6 @@ def start_eel():
 
 
 threading.Thread(target=start_eel, ).start()
-flsk.run(host='0.0.0.0', port='25391')
+flsk.run(host='0.0.0.0', port='1234')
 
 
